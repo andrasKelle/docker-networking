@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  web:
+    image: "" # ECR image URI
+    network_mode: host
+    restart: on-failure
+  alpine-secret:
+    build:
+        context: ./src/secret
+        dockerfile: Dockerfile
+    network_mode: none
+    command: sh -c "tail -f /dev/null"
+  client:
+    build:
+      context: ./src/client
+      dockerfile: Dockerfile
+    deploy:
+        mode: replicated
+        replicas: 2
+    network_mode: bridge
+    command: sh -c "tail -f /dev/null"
+  vip-client:
+    build:
+      context: ./src/client
+      dockerfile: Dockerfile
+    deploy:
+        mode: replicated
+        replicas: 2
+    command: sh -c "tail -f /dev/null"
+    networks:
+        - vip-clients
+
+networks:
+    vip-clients:
+        driver: bridge
+        name: vip-clients
